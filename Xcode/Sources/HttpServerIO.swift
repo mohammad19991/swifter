@@ -75,26 +75,26 @@ open class HttpServerIO {
         let address = forceIPv4 ? listenAddressIPv4 : listenAddressIPv6
         self.socket = try Socket.tcpSocketForListen(port, forceIPv4, SOMAXCONN, address)
         self.state = .running
-//        queue.async { [weak self] in
-//            guard let strongSelf = self else { return }
-//            guard strongSelf.operating else { return }
-            while let socket = try? self.socket.acceptClientSocket() {
-//                queue.async { [weak self] in
-//                    guard let strongSelf = self else { return }
-//                    guard strongSelf.operating else { return }
+        queue.async { [weak self] in
+            guard let strongSelf = self else { return }
+            guard strongSelf.operating else { return }
+            while let socket = try? strongSelf.socket.acceptClientSocket() {
+                queue.async { [weak self] in
+                    guard let strongSelf = self else { return }
+                    guard strongSelf.operating else { return }
 //                    self.queue.async {
-                        self.sockets.insert(socket)
+                    strongSelf.sockets.insert(socket)
 //                    }
 
-                    self.handleConnection(socket)
+                    strongSelf.handleConnection(socket)
 
 //                    self.queue.async {
-                        self.sockets.remove(socket)
+                    strongSelf.sockets.remove(socket)
 //                    }
-//                }
+                }
             }
-            self.stop()
-//        }
+            strongSelf.stop()
+        }
     }
 
     public func stop() {
