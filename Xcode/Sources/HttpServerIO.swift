@@ -82,15 +82,15 @@ open class HttpServerIO {
                 queue.async { [weak self] in
                     guard let strongSelf = self else { return }
                     guard strongSelf.operating else { return }
-//                    self.queue.async {
-                    strongSelf.sockets.insert(socket)
-//                    }
-
+                    strongSelf.queue.async {
+                        strongSelf.sockets.insert(socket)
+                    }
+                    
                     strongSelf.handleConnection(socket)
-
-//                    self.queue.async {
-                    strongSelf.sockets.remove(socket)
-//                    }
+                    
+                    strongSelf.queue.async {
+                        strongSelf.sockets.remove(socket)
+                    }
                 }
             }
             strongSelf.stop()
